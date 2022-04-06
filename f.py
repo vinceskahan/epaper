@@ -10,6 +10,8 @@
 import argparse
 from datetime import datetime
 import os
+import paho.mqtt.client as mqtt
+import requests
 import sys
 
 picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
@@ -32,21 +34,20 @@ logging.basicConfig(level=logging.INFO)
 #logging.basicConfig(level=logging.DEBUG)
 
 def get_time():
-    return time.strftime('%H:%M:%S')
+    return time.strftime('%I:%M %p')
 
-def get_MQTT_temp(broker,topic):
-    return "42.5 degF"
-
-def get_MQTT_gust(broker,topic):
-    return "13 mph"
-
-def get_MQTT_rain(broker,topic):
-    return "0.13 in"
-
-def display_it(broker,topic):
+def get_weather():
     try:
-        logging.info("epd2in13_V2 Demo")
-    
+        # this file is written by weewx on a computer on the LAN
+        # so just grab the results and pick off the temperature
+        weather = requests.get('http://192.168.1.128/weewx/current.html').text.split()
+        temp = weather[2] + " F"
+        return temp
+    except: 
+        return "unavailable"
+
+def display_it():
+    try:
         epd = epd2in13_V2.EPD()
         logging.info("init and Clear")
         epd.init(epd.FULL_UPDATE)
@@ -56,6 +57,7 @@ def display_it(broker,topic):
         font15 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 15)
         font18 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 18)
         font24 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 24)
+        font32 = ImageFont.truetype(os.path.join(picdir, 'Font.ttc'), 32)
     
         time_image = Image.new('1', (epd.height, epd.width), 255)
         time_draw = ImageDraw.Draw(time_image)
@@ -69,14 +71,11 @@ def display_it(broker,topic):
             epd.init(epd.PART_UPDATE)
             time_draw.rectangle((0, 0, epd.height, epd.width), fill = 255)
 
-            # future MQTT display
-            time_draw.text((80,0),  get_MQTT_temp(broker,topic), font = font24, fill = 0)
-            time_draw.text((100,50), get_MQTT_gust(broker,topic), font = font18, fill = 0)
-            time_draw.text((100,70), get_MQTT_rain(broker,topic), font = font18, fill = 0)
+            time_draw.text((80, 20), get_weather(), font = font32, fill = 0)
             # reasonably centered
             #     time_draw.text((80,  50), get_time(),  font = font18, fill = 0)
             # bottom row
-            time_draw.text((100,  105), get_time(),  font = font15, fill = 0)
+            time_draw.text((85,  105), get_time(),  font = font18, fill = 0)
 
             epd.displayPartial(epd.getbuffer(time_image))
 
@@ -153,9 +152,6 @@ def clear_it():
         epd2in13_V2.epdconfig.module_exit()
         exit()
 
-def setup_mqtt(mqtt_broker,mqtt_topic):
-        print("mqtt=%s mqtt_broker=%s topic=%s" % (args.mqtt, args.mqtt_broker, args.mqtt_topic))
-
 if __name__ == "__main__":
 
     # argument parsing is u.g.l.y it ain't got no alibi, it's ugly !
@@ -179,13 +175,6 @@ if __name__ == "__main__":
             clear_it()
             sys.exit(0)
 
-    if (args.mqtt) or (args.mqtt_broker) or (args.mqtt_topic):
-        if (not args.mqtt) or (not args.mqtt_broker) or (not args.mqtt_topic):
-            print ("\n# exiting - must also specify --mqtt_broker and -mqtt_topic")
-            parser.print_usage()
-            print ()
-            sys.exit(1)
-
     if args.mqtt_broker:
         MQTT_HOST = args.mqtt_broker
 
@@ -200,7 +189,9 @@ if __name__ == "__main__":
     else:
         if args.mqtt:
             setup_mqtt(args.mqtt_broker,args.mqtt_topic)
-        display_it(args.mqtt_broker,args.mqtt_topic)
+
+        res = requests.get('http://192.168.1.128/weewx/current.html')
+        display_it()
 
 
 #############

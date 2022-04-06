@@ -3,10 +3,11 @@ import paho.mqtt.client as mqtt
 
 def on_connect(client, userdata, flags, rc):
     print("connected with result code {0}".format(str(rc)))
-    client.subscribe("testing/junk")
+    client.subscribe("vp2/outTemp")
 
 def on_message(client, userdata, msg):
-    print("Message received-> %s %s" % (msg.topic, str(msg.payload)))
+    print(str(msg.payload.decode('utf-8')) + " degF" )
+    client.disconnect()
 
 client = mqtt.Client("epaper_display")
 client.on_connect = on_connect
