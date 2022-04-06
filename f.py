@@ -170,9 +170,14 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--mqtt_broker", dest="mqtt_broker", action="store", help="MQTT broker hostname")
     parser.add_argument("-t", "--mqtt_topic",  dest="mqtt_topic",  action="store", help="MQTT topic to post to")
 
+    parser.add_argument("-c", "--clear", dest="clear", action="store_true", help="clear screen to prevent burn-in")
     parser.add_argument("-d", "--dry_run", dest="dry_run", action="store_true", help="dry_run - show what you 'would' do")
 
     args = parser.parse_args()
+
+    if (args.clear):
+            clear_it()
+            sys.exit(0)
 
     if (args.mqtt) or (args.mqtt_broker) or (args.mqtt_topic):
         if (not args.mqtt) or (not args.mqtt_broker) or (not args.mqtt_topic):
