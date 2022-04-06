@@ -30,8 +30,7 @@ import traceback
 #   INFO is a little more verbose
 #   DEBUG is more verbose than INFO
 
-logging.basicConfig(level=logging.INFO)
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 def get_time():
     return time.strftime('%I:%M %p')
@@ -94,11 +93,11 @@ def display_it():
                 epd.init(epd.PART_UPDATE)
 
             # let it sleep for a bit
-            print("quick epd.sleep")
+            logging.info("quick epd.sleep")
             epd.sleep()
             epd.init(epd.PART_UPDATE)
-            print("sleeping 60")
-            print()
+            logging.info("sleeping 60")
+            logging.info()
             time.sleep(60)
 
         epd.Clear(0xFF)
@@ -148,7 +147,7 @@ def clear_it():
         epd.Clear(0xFF)
 
         time.sleep(5)
-        print("done trying to prevent burnin")
+        logging.info("done trying to prevent burnin")
         epd2in13_V2.epdconfig.module_exit()
         exit()
 
@@ -162,12 +161,7 @@ if __name__ == "__main__":
         """,
     )
 
-    parser.add_argument("-m", "--mqtt", dest="mqtt", action="store_true", help="listen for MQTT data")
-    parser.add_argument("-b", "--mqtt_broker", dest="mqtt_broker", action="store", help="MQTT broker hostname")
-    parser.add_argument("-t", "--mqtt_topic",  dest="mqtt_topic",  action="store", help="MQTT topic to post to")
-
     parser.add_argument("-c", "--clear", dest="clear", action="store_true", help="clear screen to prevent burn-in")
-    parser.add_argument("-d", "--dry_run", dest="dry_run", action="store_true", help="dry_run - show what you 'would' do")
 
     args = parser.parse_args()
 
@@ -175,23 +169,8 @@ if __name__ == "__main__":
             clear_it()
             sys.exit(0)
 
-    if args.mqtt_broker:
-        MQTT_HOST = args.mqtt_broker
-
-    if args.mqtt_topic:
-        MQTT_TOPLEVEL_TOPIC = args.mqtt_topic
-
-    if args.dry_run:
-        print()
-        print("mqtt=%s mqtt_broker=%s topic=%s" % (args.mqtt, args.mqtt_broker, args.mqtt_topic))
-        print()
-        print("done")
-    else:
-        if args.mqtt:
-            setup_mqtt(args.mqtt_broker,args.mqtt_topic)
-
-        res = requests.get('http://192.168.1.128/weewx/current.html')
-        display_it()
+    res = requests.get('http://192.168.1.128/weewx/current.html')
+    display_it()
 
 
 #############
