@@ -97,7 +97,6 @@ def display_it():
             epd.sleep()
             epd.init(epd.PART_UPDATE)
             logging.info("sleeping 60")
-            logging.info()
             time.sleep(60)
 
         epd.Clear(0xFF)
