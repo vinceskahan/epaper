@@ -1,15 +1,24 @@
 # epaper
-waveshare 2.13 v2 epaper clock
+This is based on the waveshare 2.13 v2 epaper demo example
 
+```
 ## install python requirements
 pip3 install -r requirements.txt
 
 ## run it manually
+# hit ^C once to kill and run the clearscreen routines
+# hit ^C twice to kill it immediately
 python3 epaper.py
 
-## stop it
-hit ^C and it'll run the clear screen routine then exit
+# or run it in the background
+#   first you should symlink 'nohup.out' to /dev/null in your current
+#   working directory so you don't write any output to nohup.out on disk
 
-## run the clear screen routine manually
+# then run the following command to background the program
+nohup python3 epaper.py  &
+
+# to run the clear screen routine manually
 python3 epaper.py --clear
+
+```
 

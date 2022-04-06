@@ -70,17 +70,14 @@ def display_it():
             epd.init(epd.PART_UPDATE)
             time_draw.rectangle((0, 0, epd.height, epd.width), fill = 255)
 
-            time_draw.text((80, 20), get_weather(), font = font32, fill = 0)
-            # reasonably centered
-            #     time_draw.text((80,  50), get_time(),  font = font18, fill = 0)
-            # bottom row
-            time_draw.text((85,  105), get_time(),  font = font18, fill = 0)
+            time_draw.text((80,  20), get_weather(), font = font32, fill = 0)
+            time_draw.text((85, 105), get_time(),    font = font18, fill = 0)
 
             epd.displayPartial(epd.getbuffer(time_image))
 
             # clear screen occasionally to prevent burn-in
             now_min = datetime.now().strftime('%M')
-            if now_min == '29' or now_min == '12':
+            if now_min == '29' or now_min == '59':
                 logging.info("cya clear at %s" % now_min)
                 epd.init(epd.FULL_UPDATE)
                 time_draw.rectangle((0, 0, epd.height, epd.width), fill = 255)
@@ -168,7 +165,7 @@ if __name__ == "__main__":
             clear_it()
             sys.exit(0)
 
-    res = requests.get('http://192.168.1.128/weewx/current.html')
+    # this will call the weather data too
     display_it()
 
 

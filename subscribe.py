@@ -1,3 +1,7 @@
+#
+# quickie mqtt subscribe example based on an example somebody posted on Internet
+# with tweaking to run here
+#
 
 import paho.mqtt.client as mqtt
 

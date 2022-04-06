@@ -6,6 +6,9 @@
 # - this assumes the script is in a subdirectory at the same level as 'lib' and 'pic'
 #   directories used in the example
 #
+#
+# this is a standalone program to clear the display
+# just to have one available...
 
 import sys
 import os
