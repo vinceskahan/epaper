@@ -37,13 +37,16 @@ def get_time():
 
 def get_weather():
     try:
-        # this file is written by weewx on a computer on the LAN
+        # this file is written by weewx on a computer elsewhere on the LAN
+        weather = requests.get('http://192.168.1.128/weewx/current.html')
+        weather.close()
         # so just grab the results and pick off the temperature
-        weather = requests.get('http://192.168.1.128/weewx/current.html').text.split()
-        temp = weather[2] + " F"
+        #  current = 46.2 F   max/min = 58.4/45.3   rain = 0.12 in
+        temp = weather.text.split()[2] + " F"
         return temp
-    except: 
-        return "unavailable"
+    except Exception as e:
+        logging.error("epaper can't get weather data: %s" % e)
+        return "N/A"
 
 def display_it():
     try:
